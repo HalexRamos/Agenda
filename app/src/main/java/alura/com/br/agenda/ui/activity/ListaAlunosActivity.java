@@ -23,6 +23,7 @@ import alura.com.br.agenda.model.Aluno;
 public class ListaAlunosActivity extends AppCompatActivity {
 
     public static final String TITULO_APPBAR = "Lista de alunos";
+    public static final String CHAVE_ALUNO = "aluno";
     private final AlunoDAO dao = new AlunoDAO();
 
     @Override
@@ -49,15 +50,24 @@ public class ListaAlunosActivity extends AppCompatActivity {
     private void configuraLista() {
         ListView listaDeAlunos = findViewById(R.id.activity_lista_alunos_listview);
         final List<Aluno> alunos = dao.todos();
-        listaDeAlunos.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, alunos));
-        listaDeAlunos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Aluno alunoEscolhido = alunos.get(i);
-                Intent vaiParaFormularioActivity = new Intent(ListaAlunosActivity.this, FormularioAlunoActivity.class);
-                vaiParaFormularioActivity.putExtra("aluno", alunoEscolhido);
-                startActivity(vaiParaFormularioActivity);
-            }
+        configuraAdapter(listaDeAlunos, alunos);
+        configuraListenerDeCliquePorItem(listaDeAlunos);
+    }
+
+    private void configuraListenerDeCliquePorItem(ListView listaDeAlunos) {
+        listaDeAlunos.setOnItemClickListener((adapterView, view, i, l) -> {
+            Aluno alunoEscolhido = (Aluno) adapterView.getItemAtPosition(i);
+            abreFormularioModoEditaAluno(alunoEscolhido);
         });
+    }
+
+    private void abreFormularioModoEditaAluno(Aluno aluno) {
+        Intent vaiParaFormularioActivity = new Intent(ListaAlunosActivity.this, FormularioAlunoActivity.class);
+        vaiParaFormularioActivity.putExtra(CHAVE_ALUNO, aluno);
+        startActivity(vaiParaFormularioActivity);
+    }
+
+    private void configuraAdapter(ListView listaDeAlunos, List<Aluno> alunos) {
+        listaDeAlunos.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, alunos));
     }
 }
