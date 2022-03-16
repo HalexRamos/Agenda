@@ -2,28 +2,25 @@ package alura.com.br.agenda.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-import alura.com.br.agenda.DAO.AlunoDAO;
 import alura.com.br.agenda.R;
+import alura.com.br.agenda.DAO.AlunoDAO;
 import alura.com.br.agenda.model.Aluno;
+
+import static alura.com.br.agenda.ui.activity.ConstantesActivities.CHAVE_ALUNO;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
     public static final String TITULO_APPBAR = "Lista de alunos";
-    public static final String CHAVE_ALUNO = "aluno";
     private final AlunoDAO dao = new AlunoDAO();
 
     @Override
@@ -32,13 +29,22 @@ public class ListaAlunosActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lista_alunos);
         setTitle(TITULO_APPBAR);
         configuraFabNovoAluno();
-        dao.salva(new Aluno("Halex Penha Ramos", "(16) 99999-9999", "halex@gmail.com"));
-        dao.salva(new Aluno("Igor Penha Ramos", "(16) 99999-9999", "igor@gmail.com"));
+        dao.salva(new Aluno("Halex Penha Ramos", "1122223333", "halex@alura.com.br"));
+        dao.salva(new Aluno("Igor Penha Ramos", "1122223333", "igor@alura.com.br"));
     }
 
     private void configuraFabNovoAluno() {
         FloatingActionButton botaoNovoAluno = findViewById(R.id.activity_lista_alunos_fab_novo_aluno);
-        botaoNovoAluno.setOnClickListener(view -> startActivity(new Intent(ListaAlunosActivity.this, FormularioAlunoActivity.class)));
+        botaoNovoAluno.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                abreFormularioModoInsereAluno();
+            }
+        });
+    }
+
+    private void abreFormularioModoInsereAluno() {
+        startActivity(new Intent(this, FormularioAlunoActivity.class));
     }
 
     @Override
@@ -55,9 +61,12 @@ public class ListaAlunosActivity extends AppCompatActivity {
     }
 
     private void configuraListenerDeCliquePorItem(ListView listaDeAlunos) {
-        listaDeAlunos.setOnItemClickListener((adapterView, view, i, l) -> {
-            Aluno alunoEscolhido = (Aluno) adapterView.getItemAtPosition(i);
-            abreFormularioModoEditaAluno(alunoEscolhido);
+        listaDeAlunos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int posicao, long id) {
+                Aluno alunoEscolhido = (Aluno) adapterView.getItemAtPosition(posicao);
+                abreFormularioModoEditaAluno(alunoEscolhido);
+            }
         });
     }
 
@@ -68,6 +77,9 @@ public class ListaAlunosActivity extends AppCompatActivity {
     }
 
     private void configuraAdapter(ListView listaDeAlunos, List<Aluno> alunos) {
-        listaDeAlunos.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, alunos));
+        listaDeAlunos.setAdapter(new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                alunos));
     }
 }
